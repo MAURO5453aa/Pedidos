@@ -1,9 +1,21 @@
 const express = require('express');
-const router = express.Router(); // ✅ Corrección aquí
-const Order = require('../models/order'); // ✅ Corrección aquí
+const Order = require('../models/order');
+const { authenticateToken, isAdmin } = require('../middlewares/authMiddleware');
 
-// Ruta para crear un pedido
-router.post('/', async (req, res) => {  // ✅ Se usa router en lugar de app
+const router = express.Router();
+
+// Obtener pedidos (solo admins)
+router.get('/', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const orders = await Order.find().populate('user').populate('products');
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Crear pedido (solo usuarios autenticados)
+router.post('/', authenticateToken, async (req, res) => {
     try {
         const { user, products, totalPrice } = req.body;
         const newOrder = new Order({ user, products, totalPrice });
@@ -14,14 +26,4 @@ router.post('/', async (req, res) => {  // ✅ Se usa router en lugar de app
     }
 });
 
-// Ruta para obtener todos los pedidos
-router.get('/', async (req, res) => {  // ✅ Se usa router en lugar de app
-    try {
-        const orders = await Order.find().populate('user').populate('products');
-        res.json(orders);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-module.exports = router; // ✅ Exportar correctamente el router
+module.exports = router;

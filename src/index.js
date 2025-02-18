@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const productRoutes = require('./routes/productRoutes');
 const userRoutes = require('./routes/userRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const authRoutes = require('./routes/authRoutes'); // ✅ Asegurar que esto está
 
 const app = express();
 const port = 3000;
@@ -16,6 +17,7 @@ mongoose.connect("mongodb+srv://MAUROPINEDA:MAURO123aa@cluster0.bk8ae.mongodb.ne
 app.use(express.json());
 
 // Usar las rutas modularizadas
+app.use('/auth', authRoutes); // ✅ Asegurar que esto está
 app.use('/products', productRoutes);
 app.use('/users', userRoutes);
 app.use('/orders', orderRoutes);
